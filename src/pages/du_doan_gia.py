@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 
+from src.config import * # type: ignore
 from src.utils.ui_components import UIComponents # type: ignore
 from src.utils.charts import bieu_do_gia_xe, price_range_chart, show_price_suggestion # type: ignore
 from src.utils.data_processor import load_data, load_model, append_to_csv # type: ignore
@@ -18,7 +19,7 @@ st.set_page_config(
 ui = UIComponents()
 
 # khai báo path
-new_post_file = "./data/results/results_new_post.csv"
+new_post_file = "./data/results/results_post_new_pending.csv"
 
 # Load ngay khi import module
 data = load_data("./data/processed/data_motobikes_cleaned.csv")
@@ -236,19 +237,22 @@ def du_doan_gia_xe(df, model_regression_best):
 
         if dang_tin_button:
             data = {
-                "gia": gia_du_doan,
+                "gia_ban": gia_du_doan,
+                "gia_du_doan": gia_du_doan,
                 "thuong_hieu": [input_data['thuong_hieu']],
                 "dong_xe": [input_data['dong_xe']],
                 "loai_xe": [input_data['loai_xe']],
                 "so_km_da_di": [input_data['so_km_da_di']],
                 "nam_dang_ky": [input_data['nam_dang_ky']],
                 "dung_tich_xe": [input_data['dung_tich_xe']],
-                "tinh_trang": [input_data['tinh_trang']],                
+                "tinh_trang": [input_data['tinh_trang']],
                 "xuat_xu": [input_data['xuat_xu']],
                 "mo_ta_chi_tiet": "Đang cập nhật",
-                'danh_dau': "Hợp lệ",
-                "anomaly_flag": 0,
-            } 
+                "anomaly_flag": False,
+                "hop_le": True,
+                'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
+            }
+             
             df = pd.DataFrame(data)            
             append_to_csv(df, new_post_file)            
             # Load data sau khi lưu và show
@@ -267,7 +271,9 @@ def du_doan_gia_xe(df, model_regression_best):
             key="mo_ta_chi_tiet",
             placeholder="Nhập các thông tin đặc biệt về xe...",
             height=80
-        )        
+        )       
+        mo_ta_chi_tiet = "dang do xet"
+        st.write(mo_ta_chi_tiet)
         st.table(pd.DataFrame(summary.items(), columns=["Thông Tin", "Giá Trị"]))
 
         

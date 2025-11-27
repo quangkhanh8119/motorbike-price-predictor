@@ -18,3 +18,6 @@ TFIDF_VECTORIZER = MODEL_DIR / "tfidf_vectorizer.pkl"
 # Constants
 PRICE_COLUMN = "Giá TB"
 CONDITION_COLUMN = "Tình Trạng"
+
+# Results paths
+NEW_POST_FILE = RESULTS_DATA / "results_post_new_pending.csv"
