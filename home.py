@@ -3,7 +3,7 @@ import streamlit as st
 from src.config import BASE_DIR
 from src.utils.ui_components import UIComponents
 from src.pages import gioi_thieu, du_doan_gia, phat_hien_bat_thuong
-from src.pages import phan_tich_thi_truong, quan_ly_tin_dang
+from src.pages import phan_tich_thi_truong, tim_kiem_so_sanh
 
 
 st.set_page_config(
@@ -35,28 +35,45 @@ def menu_sidebar():
                 "ℹ️ Giới thiệu",
                 "💰 Dự đoán giá xe",
                 "🚨 Phát hiện giá bất thường", 
-                "📊 Phân tích thị trường",
+                "🔍 Tìm kiếm & So sánh",
+                "📊 Thống kê & Phân tích",
                 "📝 Quản lý tin đăng"
             ]
         )
+
+        # Menu con cho "Quản lý tin đăng"
+        submenu = None
+        if selected_page == "📝 Quản lý tin đăng":            
+            UIComponents.divider("dotted", "#ddd", "10px")
+            sub_menu = st.radio(
+                "Chọn chức năng:",
+                [
+                    "➕ Đăng tin mới",
+                    "📋 Thống kê tin đăng",
+                    "🗄️ Tin đã lưu"
+                ],
+                key="submenu_ql_tin_dang"
+            )
         
-        st.markdown("---")
+        UIComponents.divider("dotted", "#ddd", "20px")
         
         # Thêm info
         with st.expander("ℹ️ Thông tin"):
             st.write("""
-            - 📅 Cập nhật: 25/11/2024
-            - 📊 Tổng tin: 10,234
-            - 🎯 Độ chính xác: 92%
-            """)
-        
-        with st.expander("💰 Dự đoán giá xe"):
-            st.write("""
-            - 📅 Cập nhật: 25/11/2024
-            - 📊 Tổng tin: 7,234
-            - 🎯 Độ chính xác: 90%
-            """)
+            👨‍🎓 ***Học vien*** 
+            - Nguyễn Quang Khánh
+            - Nguyễn Đức Bằng
+            """)           
+            
+            UIComponents.divider("dotted", "#ddd", "10px")
 
+            st.write("""
+            📚 ***Data & Models***
+            - Cập nhật: 25/11/2024
+            - Tổng tin: 6,821
+            - Độ chính xác: 92%
+            """)
+                
     # Kiểm tra nếu trang thay đổi
     if st.session_state.current_page != selected_page:
         # Xóa dữ liệu cũ
@@ -68,7 +85,6 @@ def menu_sidebar():
     # Cập nhật trang hiện tại
     st.session_state.current_page = selected_page
 
-
     # Xử lý routing
     if selected_page == "ℹ️ Giới thiệu":        
         gioi_thieu.show()
@@ -77,23 +93,76 @@ def menu_sidebar():
         # Nội dung trang chủ
         
     elif selected_page == "💰 Dự đoán giá xe":
-        st.sidebar.image("./assets/logo.jpg", width=256)
+        st.sidebar.image("./assets/logo_s.jpg", width=256)
         du_doan_gia.show()
         # Nội dung dự đoán giá
         
     elif selected_page == "🚨 Phát hiện giá bất thường":
-        st.sidebar.image("./assets/logo.jpg", width=256)     
+        st.sidebar.image("./assets/logo_s.jpg", width=256)
         phat_hien_bat_thuong.show()
         # Nội dung phát hiện bất thường
+
+    elif selected_page == "🔍 Tìm kiếm & So sánh":        
+        st.sidebar.image("./assets/logo_s.jpg", width=256)        
+        tim_kiem_so_sanh.show()
+        
         
     elif selected_page == "📊 Phân tích thị trường":
         st.title("📊 Phân Tích Thị Trường")
+        st.sidebar.image("./assets/logo_s.jpg", width=256)
         phan_tich_thi_truong.show()
         # Nội dung phân tích
         
     elif selected_page == "📝 Quản lý tin đăng":
         st.title("📝 Quản Lý Tin Đăng")
-        quan_ly_tin_dang.show()
+        st.sidebar.image("./assets/logo_s.jpg", width=256)
+        
+        if sub_menu == "➕ Đăng tin mới":
+            st.write("## ➕ Đăng Tin Mới")
+            with st.form("form_dang_tin"):
+                col1, col2 = st.columns(2)
+                with col1:
+                    tieu_de = st.text_input("Tiêu đề tin")
+                    gia = st.number_input("Giá xe (VNĐ)", min_value=0)
+                with col2:
+                    hang_xe = st.selectbox("Hãng xe", ["Toyota", "Honda", "Ford", "BMW"])
+                    nam_sx = st.number_input("Năm sản xuất", min_value=2000, max_value=2025)
+                
+                mo_ta = st.text_area("Mô tả chi tiết")
+                
+                if st.form_submit_button("📤 Đăng tin"):
+                    st.success("✅ Đăng tin thành công!")
+        
+        elif sub_menu == "📋 Tin đang hoạt động":
+            st.write("## 📋 Tin Đang Hoạt Động")
+            # Hiển thị danh sách tin
+            tin_list = [
+                {"id": 1, "tieu_de": "Toyota Camry 2020", "gia": "950 triệu", "trang_thai": "Đang bán"},
+                {"id": 2, "tieu_de": "Honda Civic 2019", "gia": "750 triệu", "trang_thai": "Đang bán"},
+                {"id": 3, "tieu_de": "Ford Focus 2021", "gia": "650 triệu", "trang_thai": "Đang bán"}
+            ]
+            
+            for tin in tin_list:
+                with st.container(border=True):
+                    col1, col2, col3 = st.columns([2, 1, 1])
+                    with col1:
+                        st.write(f"**{tin['tieu_de']}**")
+                        st.caption(f"Giá: {tin['gia']}")
+                    with col2:
+                        st.write(f"🟢 {tin['trang_thai']}")
+                    with col3:
+                        st.button("✏️ Sửa", key=f"edit_{tin['id']}")
+                        st.button("🗑️ Xóa", key=f"delete_{tin['id']}")
+        
+        elif sub_menu == "🗄️ Tin đã lưu":
+            st.write("## 🗄️ Tin Đã Lưu")
+            saved_tin = [
+                {"tieu_de": "Tesla Model 3 2022", "gia": "1.5 tỷ"},
+                {"tieu_de": "BMW X5 2021", "gia": "2 tỷ"}
+            ]
+            
+            for tin in saved_tin:
+                st.write(f"📌 {tin['tieu_de']} - {tin['gia']}")
         # Nội dung quản lý
 
 # Run if module executed
