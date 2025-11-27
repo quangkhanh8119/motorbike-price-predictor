@@ -33,31 +33,94 @@ def show():
     - **Nguyễn Quang Khánh**  
     - **Nguyễn Đức Bằng**
     - Ngày báo cáo: 22/11/2025
-
-    ---
     """)
 
-    # Tổng quan
+    # ============================================================
+    # INTRO
+    # ============================================================
+    
     st.markdown("""
     ### 🚀 Tổng Quan Dự Án
     Dự án được triển khai dựa trên bộ dữ liệu thực tế từ **Chợ Tốt**, bao gồm thông tin về hàng chục nghìn tin rao bán xe máy.  
-    Nhóm đã thực hiện **4 bài toán** chính nhằm phân tích dữ liệu, xây dựng mô hình học máy và đề xuất giải pháp thực tế.
+    Nhóm đã thực hiện **2 bài toán** chính nhằm phân tích dữ liệu, xây dựng mô hình học máy và đề xuất giải pháp thực tế.
     """)
 
     st.markdown("---")
 
-    # Bài toán 1
+    # ============================================================
+    # REGRESSION MODEL
+    # ============================================================
     st.markdown("""
     ### 🏷️ **Dự đoán giá xe máy - Price Prediction**    
     Xây dựng mô hình hồi quy Machine Learning để dự đoán **giá bán hợp lý** dựa trên các đặc trưng:
     - Thương hiệu, dòng xe, loại xe
     - Dung tích, số km đã đi
-    - Năm đăng ký, tình trạng, xuất xứ  
+    - Năm đăng ký, tình trạng, xuất xứ
 
     👉 *Ứng dụng*: Hỗ trợ người bán định giá đúng, giúp người mua tham khảo giá thị trường chính xác.
-    """)
+                
+    #### 💡 **Mô hình tốt nhất sử dụng cho bài toán**:
+    - LightGBM Regressor hoặc XGBoost Regressor
+    - Target dùng log1p(gia) → ổn định phân phối
+    - Sai số MAPE: ~8–12%, R² cao                   
+    """)        
+    st.markdown("#### ➗ Hàm dự đoán giá (Price Prediction)")
+    st.code("""
+    def predict_price(info, model_path, features=None, inverse_log=True):
+        if not os.path.exists(model_path):
+            raise FileNotFoundError(model_path)
 
-    # Bài toán 2
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
+
+        if features is None:
+            try:
+                features = model.named_steps["preprocessor"].feature_names_in_.tolist()
+            except:
+                features = [
+                    'thuong_hieu','dong_xe','nam_dang_ky','so_km_da_di',
+                    'tinh_trang','loai_xe','dung_tich_xe','xuat_xu'
+                ]
+
+        df = prepare_input(info, features)
+
+        try:
+            pred = model.predict(df)[0]
+        except Exception as e:
+            raise RuntimeError(f"[Predict Error] {e}\\nDF:\\n{df}")
+
+        return float(np.expm1(pred) if inverse_log else pred)
+
+    """, language="python")
+    
+    st.markdown("#### 📝 Ví dụ dự đoán")
+    st.code("""
+    input_vehicle = {
+        'thuong_hieu': 'Honda',
+        'dong_xe': 'Air Blade',
+        'loai_xe': 'Xe tay ga',
+        'dung_tich_xe': '100 - 175 cc',
+        'so_km_da_di': 25000,
+        'nam_dang_ky': 2019,
+        'xuat_xu': 'Việt Nam'
+    }
+
+    price = predict_price(input_vehicle, "./Data/model_regression_best.pkl")
+    print(f"Giá dự đoán: {price:,.0f} VND")
+    """, language="python")
+
+    st.markdown("#### 💾 Lưu kết quả dự đoán → `result_regression_predictions.csv`")
+    st.code("""
+    df_save = pd.DataFrame([input_vehicle])
+    df_save['gia_du_doan'] = price
+    df_save.to_csv("regression_predictions.csv", index=False)
+    """, language="python")
+
+    st.markdown("---")
+
+    # ============================================================
+    # ANOMALY DETECTION
+    # ============================================================
     st.markdown("""
     ### 🚨 **Phát hiện giá bất thường - Anomaly Detection**
     Sử dụng mô hình dự đoán giá + nhiều kỹ thuật outlier detection để nhận diện các tin đăng có mức giá rao bán **bình thường** hay **bất thường**
@@ -65,77 +128,140 @@ def show():
     - Rao quá đắt so với thị trường 
 
     👉 *Ứng dụng*: Cảnh báo tin đăng bất thường, tăng tính minh bạch & phát hiện gian lận.
-    """
-)
-    # Bài toán 3
-    st.markdown("""
-    ### ⭐ **Gợi ý xe tương tự - Recommendation System**
-    Gợi ý xe tương tự dựa trên đặc trưng kỹ thuật của xe & nội dung mô tả:
-    - Thông tin kỹ thuật xe                
-    - Khoảng cách vector đặc trưng
-    - Nội dung mô tả xe
-    
-    👉 *Ứng dụng*: hỗ trợ người dùng nhanh chóng tìm được mẫu xe phù hợp nhu cầu.
+    #### 💡 **Mô hình tốt nhất sử dụng cho bài toán**:
+    - **Isolation Forest**
+    - hoặc **AutoEncoder Tree-Based**
     """)
 
-    # Bài toán 4
-    st.markdown("""
-    ### 📊 **Gợi ý theo cụm - Recommendation System with Clustering**
-    Sử dụng thuật toán **KMeans Clustering** để phân nhóm xe theo các đặc trưng quan trọng, từ đó gợi ý theo phân khúc xe:
-    - Phân nhóm theo thương hiệu, loại xe, dung tích
-    - Phân nhóm theo mức giá, năm đăng ký
+    st.markdown("#### ➗ Hàm kiểm tra giá bất thường")
+    st.code("""
+    def detect_price_anomaly(info, model_path, threshold=0.5):
+        with open(model_path, "rb") as f:
+            model = pickle.load(f)
 
-    👉 *Ứng dụng*: Hiểu rõ phân khúc thị trường và cá nhân hóa trải nghiệm người dùng
-    """)
+        df = prepare_input(info, model.feature_names_in_)
+
+        score = -model.decision_function(df)[0]
+        label = "ANOMALY" if score > threshold else "NORMAL"
+
+        return score, label
+    """, language="python")
+
+    st.markdown("#### 📝 Ví dụ chạy anomaly detection")
+    st.code("""
+    input_vehicle = {
+        'thuong_hieu': 'Honda',
+        'dong_xe': 'Vision',
+        'loai_xe': 'Xe tay ga',
+        'dung_tich_xe': '50 - 100 cc',
+        'so_km_da_di': 15000,
+        'gia': 55_000_000
+    }
+
+    score, label = detect_price_anomaly(input_vehicle, "./Data/model_anomaly_best.pkl")
+    print("Kết luận:", label)
+    """, language="python")
+
+    st.markdown("#### 💾 Lưu kết quả tin phát hiện bất thường → `result_anomaly_detection.csv`")
+    st.code("""
+    df_save = pd.DataFrame([input_vehicle])
+    df_save['gia_du_doan'] = price
+    df_save.to_csv("regression_predictions.csv", index=False)
+    """, language="python")
 
     st.markdown("---")
 
-    # Cấu truc dự án
+    # ============================================================
+    # MODEL EVALUATION
+    # ============================================================
+    st.markdown("### 🏅 Đánh giá mô hình")
+    st.markdown("""
+    ### **Regression**
+    - RMSE  
+    - MAE  
+    - MAPE  
+    - R²  
+
+    ### **Anomaly Detection**
+    - Precision / Recall anomaly  
+    - ROC-AUC  
+    - Biểu đồ phân phối anomaly score  
+    """)
+
+    st.write("---")
+
+    # ============================================================
+    # PROJECT STRUCTURE
+    # ============================================================
     st.markdown("""
     ### 📂 Cấu trúc Dự Án
     """)
     st.code("""
-    project/
+    project
     │
-    ├── assets/
-    │   ├── logo.png    
+    ├── assets
+    │   ├── logo.png
     │
-    ├── data/
-    │   ├── data_motobikes_cleaned.csv
-    │   ├── data_motobikes_cleaned_content_wt.csv
-    │   ├── result_regression_predictions.csv
-    │   ├── results_with_anomalies.csv
-    │   ├── vietnamese-stopwords.txt
-    │
-    ├── models/
+    ├── data
+    │   ├── raw
+    │       ├── data_motobikes.xlsx
+    │   ├── processed
+    │       ├── data_motobikes_cleaned.csv
+    │       ├── vietnamese-stopwords.txt
+    │   ├── results
+    │       ├── result_regression_predictions.csv
+    │       ├── results_with_anomalies.csv            
+    │    
+    ├── models
     │   ├── model_regression_best.pkl
-    │   ├── cosine_sim.pkl
-    │   ├── tfidf_matrix.pkl
-    │   ├── tfidf_vectorizer.pkl    
+    │   ├── cosine_similarity.pkl
     │
-    ├── src/
-    │   ├── gioi_thieu.py
-    │   ├── capstone_project1.py
-    │   ├── capstone_project2.py
-    │   ├── project1_control_page.py
-    │   ├── project2_control_page.py
-    │
-    ├── ui/
-    │   ├── ui_components.py
+    ├── src
+    │   ├── pages
+    │       ├── gioi_thieu.py
+    │       ├── du_doan_gia.py
+    │       ├── phat_hien_bat_thuong.py
+    │       ├── phan_tich_thi_truong.py
+    │       ├── quan_ly_tin_dang.py
+    │   ├── utils
+    │       ├── ui_components.py
+    │       ├── charts.py
+    │       ├── data_processor.py
+    │       ├── price_functions.py    
     │
     ├── home.py
     """)
 
     st.markdown("---")
 
-    # Kết luận
+    # ============================================================
+    # STREAMLIT UI
+    # ============================================================
+    st.markdown("### ✨ Giao diện Streamlit")
     st.markdown("""
-    ## 🎯 **Kết luận**
-    Cả bốn bài toán trên tạo thành một hệ thống phân tích & gợi ý toàn diện giúp:
+    Ứng dụng Streamlit bao gồm:
+    - Giới thiệu dự án
+    - Form cho người dùng (User):
+        - Form Dự đoán giá xe → Sự đoán và gợi ý giá bán
+        - Form Thị Trường Giá → Xem giá thị trường theo thông tin loại xe
+        - Form Phát hiện bất thường + giá → kiểm tra bất thường  
+    - Form cho quản lý (Admin):                
+        - Form Thống kê -> Thống kê tin nhắn theo ngày, loại xe và biểu đồ thị trường
+        - Form Quản lý tin đăng -> Xem, cập nhật tin đăng bất thường
+    """)
+    
+    st.write("---")
+
+    # ============================================================
+    # CONCLUSION
+    # ============================================================
+    st.markdown("""
+    ### 🎯 **Kết luận**
+    Các bài toán trên tạo thành một hệ thống phân tích & gợi ý toàn diện giúp:
     - Định giá chính xác
     - Phát hiện bất thường
     - Gợi ý thông minh
     - Phân khúc thị trường hiệu quả
                 
-    Kết quả mang lại một bộ công cụ hỗ trợ phân tích tốt cho cả Project 1 và Project 2 trong việc đưa ra gợi ý hiệu quả trong hệ thống mua bán xe máy trực tuyến.
+    Kết quả mang lại một bộ công cụ hỗ trợ phân tích tốt cho việc đưa ra gợi ý hiệu quả trong hệ thống mua bán xe máy trực tuyến.
     """)
