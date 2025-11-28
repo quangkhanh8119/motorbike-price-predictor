@@ -175,8 +175,7 @@ def quan_ly_tin_dang(df_results, type=0):
                     df_filtered.loc[index, "anomaly_flag"] = 0
                     df_filtered.loc[index, "trang_thai"] = 0                    
                     st.success(" Tin đã được duyệt đăng", icon="✅")                    
-                    save_data(df_filtered, output_path)
-                    st.rerun() 
+                    save_data(df_filtered, output_path)                    
                 elif btn_sua_tin:                    
                     df_filtered.loc[index, "trang_thai"] = 4
                     st.success(" Yêu cầu sữa lại thông tin đăng, để được duyệt", icon="🔄")
