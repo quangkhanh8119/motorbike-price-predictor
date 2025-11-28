@@ -434,8 +434,9 @@ def phat_hien_xe_bat_thuong(df, models):
                     "tinh_trang": tinh_trang,                
                     "xuat_xu": xuat_xu,
                     "mo_ta_chi_tiet": "Đang cập nhật",
-                    "anomaly_flag": ketqua['is_anomaly'],
-                    "hop_le": False,
+                    "anomaly_flag": 1 if ketqua['is_anomaly'] else 0,
+                    "hop_le": False if ketqua['is_anomaly'] else True,
+                    "cho_duyet": False if ketqua['is_anomaly'] else True,
                     'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
                 }
 

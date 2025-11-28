@@ -248,8 +248,9 @@ def du_doan_gia_xe(df, model_regression_best):
                 "tinh_trang": [input_data['tinh_trang']],
                 "xuat_xu": [input_data['xuat_xu']],
                 "mo_ta_chi_tiet": "Đang cập nhật",
-                "anomaly_flag": False,
+                "anomaly_flag": 0,
                 "hop_le": True,
+                "cho_duyet": False,
                 'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
             }
              

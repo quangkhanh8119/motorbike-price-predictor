@@ -107,8 +107,7 @@ def menu_sidebar():
         tim_kiem_so_sanh.show()
         
         
-    elif selected_page == "📊 Phân tích thị trường":
-        st.title("📊 Phân Tích Thị Trường")
+    elif selected_page == "📊 Thống kê & Phân tích":
         st.sidebar.image("./assets/logo_s.jpg", width=256)
         phan_tich_thi_truong.show()
         # Nội dung phân tích

@@ -146,26 +146,36 @@ def tim_kiem_va_so_sanh(df, models):
 
     if cb_tin_bat_thuong:
         df_result = df_result[df_result['anomaly_flag'] == 1]
+
+    df_result_new_post = load_data("./data/results/results_post_new_pending.csv")
     
     with st.expander("Xem tìm kiếm", expanded=False):
         st.dataframe(df_result, height=200)
-    # ui.divider("solid", "#ddd", "10px")
-
-    show_result(df_result)    
+    
+    show_result(df_result, df_result_new_post)    
 
 # ===== HÀM SHOW KẾT QUẢ =====
 
-def show_result(df_result):    
+def show_result(df_result, df_result_new_post):    
     ui.divider("dotted", "#ddd", "5px")
-    col_1, col_2, col_3, col_4, col_5 = st.columns(5)
+    col_1, col_2, col_3, col_4 = st.columns(4)
     with col_1:
         st.markdown(f"##### Tổng số tin: **{len(df_result)}**")
     
         # Đếm số kết quả bất thường trong df_result
         so_ket_qua_bt = len(df_result[df_result['anomaly_flag'] == 1])
         st.markdown(f"🚩 Tin **Bất Thường**: **{so_ket_qua_bt}**")
-   
+    
+    with col_2:
+        st.markdown(f"""
+                    - **Giá TB**: {df_result['gia_actual'].mean().round(0)*1000000:,.0f} đ
+                    - **Cao Nhất**: {df_result['gia_actual'].max().round(0)*1000000:,.0f} đ
+                    - **Thấp Nhất**: {df_result['gia_actual'].min().round(0)*1000000:,.0f} đ
+                    """)        
     with col_3:
+        items_list = st.selectbox("Duyệt tin theo:", ["Tất cả tin", "Tin mới nhất"])        
+
+    with col_4:
         # Menu Sắp xếp theo giá tố tập
         sort_by = st.radio("### Sắp Xếp Theo:", ["Giá từ thấp đến cao", "Giá từ cao đến thấp"])## Giá từ cao đến thấp") 
 
@@ -174,12 +184,7 @@ def show_result(df_result):
         elif sort_by == "Giá từ cao đến thấp":
             df_result = df_result.sort_values('gia_actual', ascending=False)
 
-    with col_5:
-        st.markdown(f"""
-                    - **Giá TB**: {df_result['gia_actual'].mean().round(0)*1000000:,.0f} đ
-                    - **Cao Nhất**: {df_result['gia_actual'].max().round(0)*1000000:,.0f} đ
-                    - **Thấp Nhất**: {df_result['gia_actual'].min().round(0)*1000000:,.0f} đ
-                    """)        
+    
     ui.divider("dotted", "#ddd", "10px")
 
     # In các dòng xe trong df_result
@@ -255,31 +260,5 @@ def show_result(df_result):
                             f"{row2['gia_actual']*1000000:,.0f} đ", 
                             f"{price_diff_pct:.1f}% {status}"
                         )
-    """
-    for index, row in df_result.iterrows():
-        colA, colB = st.columns(2)
-        with colA:
-            with st.container(border=True):
-                col1, col2 = st.columns([3, 2])
-                with col1:
-                    title = f"{row['thuong_hieu']} {row['dong_xe']} ({row['nam_dang_ky']:.0f})"
-                    st.markdown(f"#### {title} {row['ket_qua_bt']}")
-                    st.markdown(f"🕑 {row['so_km_da_di']:,.0f} km    📅 {row['nam_dang_ky']:.0f}")                    
-                    # st.caption(f"📉 Tiết kiệm được đ so với thị trường")
-                
-                with col2:
-                    # price_diff = row['gia_actual'] - row['gia_pred']
-                    # price_diff_pct = (price_diff / row['gia_pred'] * 100) if row['gia_pred'] > 0 else 0
-                    price_diff_pct = row['chenh_lech_gia']
-                    
-                    if abs(price_diff_pct) <= 15:
-                        color = "green"
-                        status = "✅ Hợp Lý"
-                    else:
-                        color = "red" if price_diff_pct > 0 else "blue"
-                        status = "⚠️ Cao" if price_diff_pct > 0 else "💰 Rẻ"
-                    
-                    st.metric(f"Dự đoán: {row['gia_pred']*1000000:,.0f} đ", f"{row['gia_actual']*1000000:,.0f} đ", f"{price_diff_pct:.1f}% {status}")
-    """ 
-                
+          
     # ui.divider("dashed", "#ddd", "6px")
