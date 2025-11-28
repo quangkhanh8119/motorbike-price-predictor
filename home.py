@@ -41,8 +41,34 @@ def menu_sidebar():
             ]
         )
 
-        # Menu con cho "Quản lý tin đăng"
-        submenu = None
+        # Menu con cho "Tìm kiếm & So sánh"
+        sub_menu = None
+        if selected_page == "🔍 Tìm kiếm & So sánh":
+            UIComponents.divider("dotted", "#ddd", "10px")
+            sub_menu = st.radio(
+                "Dữ liệu tìm kiếm:",
+                [
+                    "🗄️ Tìm trên dữ liệu mặc định",
+                    "🔥 Tìm trên dữ liệu mới nhất",
+                    "➕ Tìm trên tất cả dữ liệu"
+                ],
+                key="submenu_tim_kiem_so_sanh"
+            )
+        
+        # Menu con cho "Thống kê & Phân tích"
+        if selected_page == "📊 Thống kê & Phân tích":
+            UIComponents.divider("dotted", "#ddd", "10px")
+            sub_menu = st.radio(
+                "Dữ liệu thống kê:",
+                [
+                    "🗄️ Tin đăng mặc định",
+                    "🔥 Tin đăng mới nhất",
+                    "➕ Tất cả các tin đăng"
+                ],
+                key="submenu_thong_ke"
+            )
+
+        # Menu con cho "Quản lý tin đăng"        
         if selected_page == "📝 Quản lý tin đăng":            
             UIComponents.divider("dotted", "#ddd", "10px")
             sub_menu = st.radio(
@@ -54,6 +80,8 @@ def menu_sidebar():
                 ],
                 key="submenu_ql_tin_dang"
             )
+        
+        
         
         UIComponents.divider("dotted", "#ddd", "20px")
         
@@ -77,7 +105,7 @@ def menu_sidebar():
     # Kiểm tra nếu trang thay đổi
     if st.session_state.current_page != selected_page:
         # Xóa dữ liệu cũ
-        keys_to_delete = ['ket_qua_du_doan', 'kiem_tra_bat_thuong', 'ket_qua_phan_tich_thi_truong', 'ket_qua_quan_ly_tin_dang']
+        keys_to_delete = ['ket_qua_du_doan', 'kiem_tra_bat_thuong', 'tim_kiem_va_so_sanh', 'ket_qua_phan_tich_thi_truong', 'ket_qua_quan_ly_tin_dang']
         for key in keys_to_delete:
             if key in st.session_state:
                 del st.session_state[key]
@@ -104,12 +132,29 @@ def menu_sidebar():
 
     elif selected_page == "🔍 Tìm kiếm & So sánh":        
         st.sidebar.image("./assets/logo_s.jpg", width=256)        
-        tim_kiem_so_sanh.show()
-        
+         
+        if sub_menu == "🗄️ Tìm trên dữ liệu mặc định":
+            st.write("### 🗄️ Tin đăng mặc định")
+            tim_kiem_so_sanh.show()
+        elif sub_menu == "🔥 Tìm trên dữ liệu mới nhất":
+            st.write("### 🔥 Tin đăng mới nhất")
+            tim_kiem_so_sanh.show()
+        elif sub_menu == "➕ Tìm trên tất cả dữ liệu":
+            st.write("### ➕ Tất cả các tin đăng")
+            tim_kiem_so_sanh.show()
         
     elif selected_page == "📊 Thống kê & Phân tích":
         st.sidebar.image("./assets/logo_s.jpg", width=256)
-        phan_tich_thi_truong.show()
+        
+        if sub_menu == "🗄️ Tin đăng mặc định":
+            st.write("### 🗄️ Tin đăng mặc định")
+            phan_tich_thi_truong.show()
+        elif sub_menu == "🔥 Tin đăng mới nhất":
+            st.write("### 🔥 Tin đăng mới nhất")
+            phan_tich_thi_truong.show()
+        elif sub_menu == "➕ Tất cả các tin đăng":
+            st.write("### ➕ Tất cả các tin đăng")
+            phan_tich_thi_truong.show()
         # Nội dung phân tích
         
     elif selected_page == "📝 Quản lý tin đăng":
