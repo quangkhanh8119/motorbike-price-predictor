@@ -15,6 +15,10 @@ def load_data(file_path):
     df = pd.read_csv(file_path)
     return df
 
+def save_data(df, file_path):
+   
+    df.to_csv(file_path, index=False)
+
 @st.cache_resource
 def load_model(model_path):
     if not os.path.exists(model_path):
@@ -97,3 +101,7 @@ def append_to_csv_with_str(new_data_df, output_path, str):
     except Exception as e:
         st.error(f"❌ Lỗi trong quá trình lưu file: {e}")
         return False # Trả về False nếu thất bại
+
+# Hàm save df to csv
+def save_df_to_csv(df, file_path):
+    df.to_csv(file_path, index=False)

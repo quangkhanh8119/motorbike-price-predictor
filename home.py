@@ -3,7 +3,7 @@ import streamlit as st
 from src.config import BASE_DIR
 from src.utils.ui_components import UIComponents
 from src.pages import gioi_thieu, du_doan_gia, phat_hien_bat_thuong
-from src.pages import phan_tich_thi_truong, tim_kiem_so_sanh
+from src.pages import phan_tich_thi_truong, tim_kiem_so_sanh, quan_ly_tin_dang
 
 
 st.set_page_config(
@@ -74,21 +74,18 @@ def menu_sidebar():
             sub_menu = st.radio(
                 "Chọn chức năng:",
                 [
-                    "➕ Đăng tin mới",
-                    "📋 Thống kê tin đăng",
-                    "🗄️ Tin đã lưu"
+                    "➕ Tin Đăng mới",
+                    "📋 Tin Đăng mặc định"
                 ],
                 key="submenu_ql_tin_dang"
             )
-        
-        
         
         UIComponents.divider("dotted", "#ddd", "20px")
         
         # Thêm info
         with st.expander("ℹ️ Thông tin"):
             st.write("""
-            👨‍🎓 ***Học vien*** 
+            👨‍🎓 ***Học viên*** 
             - Nguyễn Quang Khánh
             - Nguyễn Đức Bằng
             """)           
@@ -97,9 +94,7 @@ def menu_sidebar():
 
             st.write("""
             📚 ***Data & Models***
-            - Cập nhật: 25/11/2024
-            - Tổng tin: 6,821
-            - Độ chính xác: 92%
+            - Cập nhật: 29/11/2024            
             """)
                 
     # Kiểm tra nếu trang thay đổi
@@ -157,56 +152,14 @@ def menu_sidebar():
             phan_tich_thi_truong.show()
         # Nội dung phân tích
         
-    elif selected_page == "📝 Quản lý tin đăng":
-        st.title("📝 Quản Lý Tin Đăng")
+    elif selected_page == "📝 Quản lý tin đăng":        
         st.sidebar.image("./assets/logo_s.jpg", width=256)
+
+        if sub_menu == "➕ Tin Đăng mới":            
+            quan_ly_tin_dang.show(0)
         
-        if sub_menu == "➕ Đăng tin mới":
-            st.write("## ➕ Đăng Tin Mới")
-            with st.form("form_dang_tin"):
-                col1, col2 = st.columns(2)
-                with col1:
-                    tieu_de = st.text_input("Tiêu đề tin")
-                    gia = st.number_input("Giá xe (VNĐ)", min_value=0)
-                with col2:
-                    hang_xe = st.selectbox("Hãng xe", ["Toyota", "Honda", "Ford", "BMW"])
-                    nam_sx = st.number_input("Năm sản xuất", min_value=2000, max_value=2025)
-                
-                mo_ta = st.text_area("Mô tả chi tiết")
-                
-                if st.form_submit_button("📤 Đăng tin"):
-                    st.success("✅ Đăng tin thành công!")
-        
-        elif sub_menu == "📋 Tin đang hoạt động":
-            st.write("## 📋 Tin Đang Hoạt Động")
-            # Hiển thị danh sách tin
-            tin_list = [
-                {"id": 1, "tieu_de": "Toyota Camry 2020", "gia": "950 triệu", "trang_thai": "Đang bán"},
-                {"id": 2, "tieu_de": "Honda Civic 2019", "gia": "750 triệu", "trang_thai": "Đang bán"},
-                {"id": 3, "tieu_de": "Ford Focus 2021", "gia": "650 triệu", "trang_thai": "Đang bán"}
-            ]
-            
-            for tin in tin_list:
-                with st.container(border=True):
-                    col1, col2, col3 = st.columns([2, 1, 1])
-                    with col1:
-                        st.write(f"**{tin['tieu_de']}**")
-                        st.caption(f"Giá: {tin['gia']}")
-                    with col2:
-                        st.write(f"🟢 {tin['trang_thai']}")
-                    with col3:
-                        st.button("✏️ Sửa", key=f"edit_{tin['id']}")
-                        st.button("🗑️ Xóa", key=f"delete_{tin['id']}")
-        
-        elif sub_menu == "🗄️ Tin đã lưu":
-            st.write("## 🗄️ Tin Đã Lưu")
-            saved_tin = [
-                {"tieu_de": "Tesla Model 3 2022", "gia": "1.5 tỷ"},
-                {"tieu_de": "BMW X5 2021", "gia": "2 tỷ"}
-            ]
-            
-            for tin in saved_tin:
-                st.write(f"📌 {tin['tieu_de']} - {tin['gia']}")
+        elif sub_menu == "📋 Tin Đăng mặc định":            
+            quan_ly_tin_dang.show(1)        
         # Nội dung quản lý
 
 # Run if module executed

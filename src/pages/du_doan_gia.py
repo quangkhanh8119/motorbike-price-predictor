@@ -249,7 +249,7 @@ def du_doan_gia_xe(df, model_regression_best):
                 "xuat_xu": [input_data['xuat_xu']],
                 "mo_ta_chi_tiet": "Đang cập nhật",
                 "anomaly_flag": 0,                
-                "trang_thai": 0,
+                "trang_thai": 0 ,
                 'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
             }
              
@@ -268,12 +268,12 @@ def du_doan_gia_xe(df, model_regression_best):
         # Additional notes        
         mo_ta_chi_tiet = st.text_area(
             "Mô tả chi tiết (ví dụ: xe chính chủ, chạy ít, màu nguyên bản, full đò chơi, ...)",
+            value="Đang cập nhật",
             key="mo_ta_chi_tiet",
             placeholder="Nhập các thông tin đặc biệt về xe...",
             height=80
-        )       
-        mo_ta_chi_tiet = "dang do xet"
-        st.write(mo_ta_chi_tiet)
+        )               
+        # st.write(mo_ta_chi_tiet)
         st.table(pd.DataFrame(summary.items(), columns=["Thông Tin", "Giá Trị"]))
 
         
