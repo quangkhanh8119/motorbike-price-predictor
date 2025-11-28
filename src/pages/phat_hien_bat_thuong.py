@@ -423,8 +423,8 @@ def phat_hien_xe_bat_thuong(df, models):
 
         if dang_tin_ban_button:
                 data_result = {                    
-                    'gia_ban': gia_ban,
-                    'gia_du_doan': ketqua['gia_du_doan'],                    
+                    'gia_ban': gia_ban/1_000_000,
+                    'gia_du_doan': ketqua['gia_du_doan']/1_000_000,
                     "thuong_hieu": thuong_hieu,
                     "dong_xe": dong_xe,
                     "loai_xe": loai_xe,
@@ -434,9 +434,8 @@ def phat_hien_xe_bat_thuong(df, models):
                     "tinh_trang": tinh_trang,                
                     "xuat_xu": xuat_xu,
                     "mo_ta_chi_tiet": "Đang cập nhật",
-                    "anomaly_flag": 1 if ketqua['is_anomaly'] else 0,
-                    "hop_le": False if ketqua['is_anomaly'] else True,
-                    "cho_duyet": False if ketqua['is_anomaly'] else True,
+                    "anomaly_flag": 1 if ketqua['is_anomaly'] else 0,                    
+                    'trang_thai': 2 if ketqua['is_anomaly'] else 1,
                     'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
                 }
 

@@ -1,14 +1,14 @@
 import streamlit as st
-import pandas as pd
-import numpy as np
+# import pandas as pd
+# import numpy as np
 
-import plotly.graph_objects as go
-import plotly.express as px
+# import plotly.graph_objects as go
+# import plotly.express as px
 
 from src.utils.ui_components import UIComponents # type: ignore
-from src.utils.charts import bieu_do_gia_xe, price_range_chart, show_price_suggestion, price_comparison_gauge, price_comparison_bar # type: ignore
+# from src.utils.charts import bieu_do_gia_xe, price_range_chart, show_price_suggestion, price_comparison_gauge, price_comparison_bar # type: ignore
 from src.utils.data_processor import load_data, load_model, append_to_csv, append_to_csv_with_str # type: ignore
-from src.utils.price_functions import format_vnd, format_trieu_vnd, suggest_price # type: ignore
+# from src.utils.price_functions import format_vnd, format_trieu_vnd, suggest_price # type: ignore
 
 # Set page config
 st.set_page_config(
@@ -23,7 +23,7 @@ ui = UIComponents()
 # Load ngay khi import module
 # data = load_data("./data/processed/data_motobikes_cleaned.csv")
 data_result_anomaly = load_data("./data/results/results_with_anomalies.csv")
-model = load_model("./models/model_regression_best.pkl")
+# model = load_model("./models/model_regression_best.pkl")
 
 # khai báo path
 # new_post_file = "./data/results/results_post_new_pending.csv"
@@ -35,7 +35,7 @@ def show():
     # Set page layout
     ui.set_page_layout_wide(width=1200, hide_branding=False)
     
-    tim_kiem_va_so_sanh(data_result_anomaly, model)
+    tim_kiem_va_so_sanh(data_result_anomaly)
 
 # ============================================================
 # HÀM XỬ LÝ TÌM KIẾM & SO SÁNH
@@ -62,7 +62,7 @@ def get_info(df, thuong_hieu, dong_xe, xuat_xu, nam_dang_ky, so_km_da_di, cb_xua
         return df
         
 
-def tim_kiem_va_so_sanh(df, models):
+def tim_kiem_va_so_sanh(df):
     
     # ===== HEADER =====    
     st.markdown("## 🚨 Công cụ Tìm kiếm & So sánh")        
@@ -71,8 +71,8 @@ def tim_kiem_va_so_sanh(df, models):
     # ui.divider_thin(style="dashed", color="#d6d6d9")
 
     # Khởi tạo session_state để lưu kết quả
-    if 'kiem_tra_bat_thuong' not in st.session_state:
-        st.session_state.kiem_tra_bat_thuong = None        
+    if 'tim_kiem_va_so_sanh' not in st.session_state:
+        st.session_state.tim_kiem_va_so_sanh = None        
 
     
     # ===== FORM INPUT - Dùng expander để gọn hơn =====
@@ -158,7 +158,7 @@ def tim_kiem_va_so_sanh(df, models):
 
 def show_result(df_result, df_result_new_post):    
     ui.divider("dotted", "#ddd", "5px")
-    col_1, col_2, col_3, col_4 = st.columns(4)
+    col_1, col_2, col_3 = st.columns(3)
     with col_1:
         st.markdown(f"##### Tổng số tin: **{len(df_result)}**")
     
@@ -171,11 +171,9 @@ def show_result(df_result, df_result_new_post):
                     - **Giá TB**: {df_result['gia_actual'].mean().round(0)*1000000:,.0f} đ
                     - **Cao Nhất**: {df_result['gia_actual'].max().round(0)*1000000:,.0f} đ
                     - **Thấp Nhất**: {df_result['gia_actual'].min().round(0)*1000000:,.0f} đ
-                    """)        
-    with col_3:
-        items_list = st.selectbox("Duyệt tin theo:", ["Tất cả tin", "Tin mới nhất"])        
+                    """)    
 
-    with col_4:
+    with col_3:
         # Menu Sắp xếp theo giá tố tập
         sort_by = st.radio("### Sắp Xếp Theo:", ["Giá từ thấp đến cao", "Giá từ cao đến thấp"])## Giá từ cao đến thấp") 
 

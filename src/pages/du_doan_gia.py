@@ -237,8 +237,8 @@ def du_doan_gia_xe(df, model_regression_best):
 
         if dang_tin_button:
             data = {
-                "gia_ban": gia_du_doan,
-                "gia_du_doan": gia_du_doan,
+                "gia_actual": gia_du_doan/1_000_000,
+                "gia_pred": gia_du_doan/1_000_000,
                 "thuong_hieu": [input_data['thuong_hieu']],
                 "dong_xe": [input_data['dong_xe']],
                 "loai_xe": [input_data['loai_xe']],
@@ -248,9 +248,8 @@ def du_doan_gia_xe(df, model_regression_best):
                 "tinh_trang": [input_data['tinh_trang']],
                 "xuat_xu": [input_data['xuat_xu']],
                 "mo_ta_chi_tiet": "Đang cập nhật",
-                "anomaly_flag": 0,
-                "hop_le": True,
-                "cho_duyet": False,
+                "anomaly_flag": 0,                
+                "trang_thai": 0,
                 'thoi_gian': pd.Timestamp.now().strftime('%Y-%m-%d %H:%M'),
             }
              
